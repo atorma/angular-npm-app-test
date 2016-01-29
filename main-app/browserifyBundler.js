@@ -27,17 +27,19 @@ function forApp(browserifyOpts) {
 }
 
 function forMockApp(browserifyOpts) {
-    var mockFilePaths = _.map(config.modules, function(modulePath) {
-        return glob.sync(path('node_modules', modulePath, '**/*.mock.js'));
-    });
-    mockFilePaths = _.flatten(mockFilePaths);
+    var mockFilePaths = _.chain(config.modules)
+        .map(function(modulePath) {
+            return glob.sync(path('node_modules', modulePath, '**/*.mock.js'));
+        })
+        .flatten()
+        .value();
 
-    var browserifier = forApp(browserifyOpts);
+    var bundler = forApp(browserifyOpts);
     _.each(mockFilePaths, function(filePath) {
-        browserifier.add(filePath);
+        bundler.add(filePath);
     });
 
-    return browserifier;
+    return bundler;
 }
 
 function createBundler(additionalOpts) {
